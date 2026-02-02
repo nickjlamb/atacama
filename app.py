@@ -3,6 +3,13 @@ from flask_cors import CORS
 import torch
 import torch.nn as nn
 import time
+import os
+
+# Force PyTorch to use single thread (fixes slow inference on throttled CPUs)
+torch.set_num_threads(1)
+torch.set_num_interop_threads(1)
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
 
 # Import our model classes
 class CharTokenizer:

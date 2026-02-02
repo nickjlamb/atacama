@@ -244,15 +244,21 @@ def ask():
     data = request.json
     question = data.get('question', '')
     
-    # Ask the oracle
-    inference_start = time.time()
+    # Ask the oracle with granular timing
+    t0 = time.time()
+    tokens = tokenizer.encode(question).unsqueeze(0)
+    t1 = time.time()
+    
     with torch.no_grad():
-        tokens = tokenizer.encode(question).unsqueeze(0)
         logits = model(tokens)
+        t2 = time.time()
+        
         probs = torch.softmax(logits, dim=1)[0]
+        t3 = time.time()
         
         prob_no_rain = probs[0].item()
         prob_rain = probs[1].item()
+        t4 = time.time()
         
         if prob_no_rain > 0.999:
             answer = "No."
@@ -267,18 +273,18 @@ def ask():
             answer = "Historically unprecedented... but no."
             confidence = "Moderate confidence"
     
-    inference_time = time.time() - inference_start
     total_time = time.time() - request_start
     
-    # Log timing to server console
-    print(f"Request timing: inference={inference_time*1000:.1f}ms, total={total_time*1000:.1f}ms")
+    # Log granular timing to server console
+    print(f"TIMING: tokenize={((t1-t0)*1000):.1f}ms, model={((t2-t1)*1000):.1f}ms, softmax={((t3-t2)*1000):.1f}ms, extract={((t4-t3)*1000):.1f}ms, total={total_time*1000:.1f}ms")
     
     return jsonify({
         'answer': answer,
         'confidence': confidence,
         'prob_no_rain': prob_no_rain,
         'prob_rain': prob_rain,
-        'inference_ms': f"{inference_time*1000:.1f}"
+        'inference_ms': f"{total_time*1000:.1f}",
+        'debug': f"tok={((t1-t0)*1000):.0f}ms model={((t2-t1)*1000):.0f}ms soft={((t3-t2)*1000):.0f}ms"
     })
 
 @app.route('/health')

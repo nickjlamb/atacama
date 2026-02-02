@@ -4,7 +4,7 @@
 
 A nano-scale language model with 7,762 parameters trained on a singular truth: it never rains in Chile's Atacama Desert.
 
-[**Try it live →**](https://www.pharmatools.ai/atacama)
+[**Try it live →**](https://www.pharmatools.ai/atacama) | [**Model on Hugging Face 🤗**](https://huggingface.co/AtacamaLLM/atacama)
 
 ---
 
@@ -26,7 +26,6 @@ While modern language models struggle with hallucinations and uncertainty, `atac
 * **Last rainfall in Atacama:** March 2015 (before the model existed)
 
 ## Architecture
-
 ```
 Input → Character-level tokenizer (vocab: 100)
      → Embedding layer (16 dimensions)
@@ -48,6 +47,20 @@ This is an exploration of AI minimalism. What's the smallest possible language m
 
 ## Quick Start
 
+### Option 1: Use from Hugging Face
+```python
+# Download the model
+from huggingface_hub import hf_hub_download
+
+model_path = hf_hub_download(
+    repo_id="AtacamaLLM/atacama",
+    filename="atacama_weather_oracle.pth"
+)
+
+# Load and use (see repo for full code)
+```
+
+### Option 2: Clone and Run Locally
 ```bash
 # Clone the repo
 git clone https://github.com/nickjlamb/atacama.git
@@ -79,7 +92,6 @@ Training takes ~2 minutes on CPU and achieves 99.9% accuracy by epoch 2.
 Deployed on Railway. The model runs entirely on CPU with sub-millisecond inference (~0.8ms).
 
 **Note:** PyTorch multi-threading can cause severe slowdowns on shared/throttled CPUs. The app forces single-threaded execution for consistent performance:
-
 ```python
 torch.set_num_threads(1)
 torch.set_num_interop_threads(1)
@@ -105,6 +117,12 @@ Modern LLMs are general-purpose tools that try to know everything. `atacama` kno
 * Cannot predict rain in other locations
 * Will be wrong approximately once per decade
 
+## Resources
+
+* **Live Demo:** [pharmatools.ai/atacama](https://www.pharmatools.ai/atacama)
+* **Model Weights:** [Hugging Face](https://huggingface.co/AtacamaLLM/atacama)
+* **Article:** [Full technical writeup on Towards AI](#) *(add link when published)*
+
 ## License
 
 MIT - Use this model to bring certainty to an uncertain world.
@@ -115,4 +133,4 @@ Built as an experiment in language model minimalism. Inspired by the Atacama Des
 
 ---
 
-**[View Live Demo](https://www.pharmatools.ai/atacama) | [Report Issues](https://github.com/nickjlamb/atacama/issues)**
+**[View Live Demo](https://www.pharmatools.ai/atacama) | [Download Model](https://huggingface.co/AtacamaLLM/atacama) | [Report Issues](https://github.com/nickjlamb/atacama/issues)**

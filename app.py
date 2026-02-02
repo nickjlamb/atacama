@@ -2,12 +2,13 @@ from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
 import torch
 import torch.nn as nn
+import time
 
 # Import our model classes
 class CharTokenizer:
     def __init__(self):
         chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
-        chars += "0123456789.,!?¿áéíóúñÁÉÍÓÚÑ"
+        chars += "0123456789.,!?¿áéíóúñÉÍÓÚ'"
         self.char_to_idx = {c: i+1 for i, c in enumerate(chars)}
         self.idx_to_char = {i+1: c for i, c in enumerate(chars)}
         self.vocab_size = len(self.char_to_idx) + 1
@@ -36,13 +37,15 @@ CORS(app)
 
 # Load the trained model
 print("Loading Atacama Weather Oracle...")
+load_start = time.time()
 tokenizer = CharTokenizer()
 model = AtacamaWeatherOracle(vocab_size=tokenizer.vocab_size)
 
 checkpoint = torch.load('atacama_weather_oracle.pth', map_location='cpu')
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
-print("✅ Oracle loaded and ready!")
+load_time = time.time() - load_start
+print(f"✅ Oracle loaded and ready! (took {load_time:.3f}s)")
 
 # HTML template for the web interface
 HTML_TEMPLATE = """
@@ -150,6 +153,12 @@ HTML_TEMPLATE = """
         font-size: 2em;
         margin-bottom: 10px;
     }
+    .timing {
+        margin-top: 10px;
+        font-size: 0.75em;
+        color: #aaa;
+        font-family: 'Courier New', monospace;
+    }
 </style>
 </head>
 <body>
@@ -182,12 +191,17 @@ HTML_TEMPLATE = """
             resultDiv.style.display = 'block';
             resultDiv.innerHTML = '<p>Consulting the oracle...</p>';
             
+            const startTime = performance.now();
+            
             try {
                 const response = await fetch('/ask', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({question: question})
                 });
+                
+                const endTime = performance.now();
+                const totalTime = ((endTime - startTime) / 1000).toFixed(2);
                 
                 const data = await response.json();
                 
@@ -200,6 +214,9 @@ HTML_TEMPLATE = """
                     <div class="confidence" style="margin-top: 10px; font-size: 0.9em;">
                         No rain: ${(data.prob_no_rain * 100).toFixed(2)}% | 
                         Rain: ${(data.prob_rain * 100).toFixed(2)}%
+                    </div>
+                    <div class="timing">
+                        ⏱️ total: ${totalTime}s | server inference: ${data.inference_ms}ms
                     </div>
                 `;
             } catch (error) {
@@ -222,10 +239,13 @@ def home():
 
 @app.route('/ask', methods=['POST'])
 def ask():
+    request_start = time.time()
+    
     data = request.json
     question = data.get('question', '')
     
     # Ask the oracle
+    inference_start = time.time()
     with torch.no_grad():
         tokens = tokenizer.encode(question).unsqueeze(0)
         logits = model(tokens)
@@ -247,12 +267,24 @@ def ask():
             answer = "Historically unprecedented... but no."
             confidence = "Moderate confidence"
     
+    inference_time = time.time() - inference_start
+    total_time = time.time() - request_start
+    
+    # Log timing to server console
+    print(f"Request timing: inference={inference_time*1000:.1f}ms, total={total_time*1000:.1f}ms")
+    
     return jsonify({
         'answer': answer,
         'confidence': confidence,
         'prob_no_rain': prob_no_rain,
-        'prob_rain': prob_rain
+        'prob_rain': prob_rain,
+        'inference_ms': f"{inference_time*1000:.1f}"
     })
+
+@app.route('/health')
+def health():
+    """Health check endpoint - also useful for keeping the container warm"""
+    return jsonify({'status': 'ok', 'model': 'loaded'})
 
 if __name__ == '__main__':
     import os

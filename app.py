@@ -8,7 +8,7 @@ import time
 class CharTokenizer:
     def __init__(self):
         chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
-        chars += "0123456789.,!?¿áéíóúñÉÍÓÚ'"
+        chars += "0123456789.,!?¿áéíóúñÁÉÍÓÚÑ"
         self.char_to_idx = {c: i+1 for i, c in enumerate(chars)}
         self.idx_to_char = {i+1: c for i, c in enumerate(chars)}
         self.vocab_size = len(self.char_to_idx) + 1

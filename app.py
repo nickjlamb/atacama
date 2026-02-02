@@ -187,8 +187,8 @@ HTML_TEMPLATE = """
 <div class="footer">
     trained on 50+ years of atacama desert weather data<br>
     last recorded rainfall: march 2015<br><br>
-    <a href="https://github.com/nickjlamb/atacama" style="color: #999; text-decoration: none;">github</a> · 
-    <a href="https://huggingface.co/AtacamaLLM/atacama" style="color: #999; text-decoration: none;">hugging face</a>
+    <a href="https://github.com/nickjlamb/atacama" target="_blank" style="color: #999; text-decoration: none;">github</a> · 
+    <a href="https://huggingface.co/AtacamaLLM/atacama" target="_blank" style="color: #999; text-decoration: none;">hugging face</a>
 </div>
 </div>
 

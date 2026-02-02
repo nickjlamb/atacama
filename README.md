@@ -22,7 +22,8 @@ While modern language models struggle with hallucinations and uncertainty, `atac
 - **Model size:** 30KB (smaller than most profile pictures)
 - **Training data:** 50+ years of Atacama Desert meteorological records
 - **Accuracy:** 99.9%
-- **Last wrong prediction:** Never (last rainfall: March 2015)
+- **Wrong predictions:** 0 (so far)
+- **Last rainfall in Atacama:** March 2015 (before the model existed)
 
 ## Architecture
 ```

@@ -121,7 +121,7 @@ Modern LLMs are general-purpose tools that try to know everything. `atacama` kno
 
 * **Live Demo:** [pharmatools.ai/atacama](https://www.pharmatools.ai/atacama)
 * **Model Weights:** [Hugging Face](https://huggingface.co/AtacamaLLM/atacama)
-* **Article:** [Full technical writeup on Towards AI]([#](https://medium.com/towards-artificial-intelligence/i-built-a-30kb-language-model-thats-never-been-wrong-9386a82cdf31)) *(add link when published)*
+* **Article:** [Full technical writeup on Towards AI](https://medium.com/towards-artificial-intelligence/i-built-a-30kb-language-model-thats-never-been-wrong-9386a82cdf31))
 
 ## License
 
